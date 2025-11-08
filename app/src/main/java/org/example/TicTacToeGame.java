@@ -7,8 +7,12 @@ public class TicTacToeGame {
     private boolean gameOver;
 
     public TicTacToeGame() {
+        this('X');
+    }
+
+    public TicTacToeGame(char startingPlayer) {
         board = new String[]{"1","2","3","4","5","6","7","8","9"};
-        currentPlayer = 'X';
+        currentPlayer = startingPlayer;
         winner = ' ';
         gameOver = false;
     }
@@ -24,13 +28,11 @@ public class TicTacToeGame {
     }
 
     public boolean makeMove(int move) {
-        if (move < 1 || move > 9) {
-            return false;
-        }
+        if (move < 1 || move > 9) return false;
+
         int index = move - 1;
-        if (board[index].equals("X") || board[index].equals("O")) {
-            return false;
-        }
+
+        if (board[index].equals("X") || board[index].equals("O")) return false;
 
         board[index] = String.valueOf(currentPlayer);
 
@@ -46,64 +48,38 @@ public class TicTacToeGame {
     }
 
     private void switchPlayer() {
-        if (currentPlayer == 'X') {
-            currentPlayer = 'O';
-        } else {
-            currentPlayer = 'X';
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    private boolean isBoardFull() {
+        for (String cell : board) {
+            if (!(cell.equals("X") || cell.equals("O"))) return false;
         }
+        return true;
     }
 
-   private boolean isBoardFull() {
-    for (int i = 0; i < board.length; i++) {
-        if (!(board[i].equals("X") || board[i].equals("O"))) {
-            return false;
+    private boolean checkWinner() {
+        int[][] winPatterns = {
+            {0, 1, 2}, {3, 4, 5}, {6, 7, 8},
+            {0, 3, 6}, {1, 4, 7}, {2, 5, 8},
+            {0, 4, 8}, {2, 4, 6}
+        };
+        for (int[] pattern : winPatterns) {
+            if (board[pattern[0]].equals(board[pattern[1]]) && board[pattern[1]].equals(board[pattern[2]]))
+                return true;
         }
-    }
-    return true;
-}
-
-   private boolean checkWinner() {
-    
-    if (board[0].equals(board[1]) && board[1].equals(board[2])) {
-        return true;
-    }
-    
-    if (board[3].equals(board[4]) && board[4].equals(board[5])) {
-        return true;
-    }
-    
-    if (board[6].equals(board[7]) && board[7].equals(board[8])) {
-        return true;
-    }
-    
-    if (board[0].equals(board[3]) && board[3].equals(board[6])) {
-        return true;
-    }
-    
-    if (board[1].equals(board[4]) && board[4].equals(board[7])) {
-        return true;
-    }
-    
-    if (board[2].equals(board[5]) && board[5].equals(board[8])) {
-        return true;
-    }
-    
-    if (board[0].equals(board[4]) && board[4].equals(board[8])) {
-        return true;
-    }
-   
-    if (board[2].equals(board[4]) && board[4].equals(board[6])) {
-        return true;
+        return false;
     }
 
-    
-    return false;
-}
     public boolean isGameOver() {
         return gameOver;
     }
 
     public char getWinner() {
         return winner;
+    }
+
+    public String getCell(int position) {
+        return board[position - 1];
     }
 }
