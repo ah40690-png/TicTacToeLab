@@ -1,5 +1,9 @@
 package org.example;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class TicTacToeGame {
     private String[] board;
     private char currentPlayer;
@@ -27,6 +31,7 @@ public class TicTacToeGame {
         System.out.println();
     }
 
+
     public boolean makeMove(int move) {
         if (move < 1 || move > 9) return false;
 
@@ -45,6 +50,96 @@ public class TicTacToeGame {
             switchPlayer();
         }
         return true;
+    }
+
+   
+    public boolean makeComputerMove() {
+        if (gameOver) return false;
+
+        char ai = currentPlayer;
+        char opponent = (ai == 'X') ? 'O' : 'X';
+
+        int chosen = -1;
+
+       
+        if (countMoves() == 0) {
+            int[] corners = {1, 3, 7, 9};
+            chosen = corners[new Random().nextInt(corners.length)];
+        }
+
+      
+        if (chosen == -1 && countMoves() == 1) {
+            if (isCellFree(5)) {
+                chosen = 5;
+            }
+        }
+
+       
+        if (chosen == -1) {
+            for (int pos : availablePositions()) {
+                int idx = pos - 1;
+                String old = board[idx];
+                board[idx] = String.valueOf(ai);
+                boolean win = checkWinner();
+                board[idx] = old;
+                if (win) {
+                    chosen = pos;
+                    break;
+                }
+            }
+        }
+
+    
+        if (chosen == -1) {
+            for (int pos : availablePositions()) {
+                int idx = pos - 1;
+                String old = board[idx];
+                board[idx] = String.valueOf(opponent);
+                boolean oppWins = checkWinner();
+                board[idx] = old;
+                if (oppWins) {
+                    chosen = pos;
+                    break;
+                }
+            }
+        }
+
+       
+        if (chosen == -1) {
+            List<Integer> avail = availablePositions();
+            if (avail.isEmpty()) return false;
+            chosen = avail.get(new Random().nextInt(avail.size()));
+        }
+
+      
+        System.out.println("Computer chooses space " + chosen);
+        boolean moved = makeMove(chosen);
+        return moved;
+    }
+
+   
+    private List<Integer> availablePositions() {
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < 9; i++) {
+            if (!board[i].equals("X") && !board[i].equals("O")) {
+                list.add(i+1);
+            }
+        }
+        return list;
+    }
+
+    private boolean isCellFree(int pos) {
+        if (pos < 1 || pos > 9) return false;
+        String v = board[pos-1];
+        return !(v.equals("X") || v.equals("O"));
+    }
+
+    private int countMoves() {
+        int c = 0;
+        for (String s : board) {
+            if (s.equals("X") || s.equals("O")) c++;
+        }
+        return c;
     }
 
     private void switchPlayer() {
@@ -77,6 +172,11 @@ public class TicTacToeGame {
 
     public char getWinner() {
         return winner;
+    }
+
+
+    public char getCurrentPlayer() {
+        return currentPlayer;
     }
 
     public String getCell(int position) {
