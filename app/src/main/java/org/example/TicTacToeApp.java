@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 public class TicTacToeApp {
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         boolean playAgain = true;
@@ -13,13 +14,14 @@ public class TicTacToeApp {
 
         TrackPlayerStats stats = new TrackPlayerStats();
         LogGame logger = new LogGame("game.txt");
+        ComputerPlayer cpu = new ComputerPlayer();
 
         System.out.println("Welcome to Tic-Tac-Toe!");
 
         while (playAgain) {
 
-            
             int selection = 0;
+
             while (selection < 1 || selection > 3) {
                 System.out.println();
                 System.out.println("What kind of game would you like to play?");
@@ -27,7 +29,9 @@ public class TicTacToeApp {
                 System.out.println("2. Human vs Computer (human goes first!)");
                 System.out.println("3. Computer vs Human (computer goes first!)");
                 System.out.print("How do you want to go about this game? ");
+
                 String selInput = in.nextLine().trim();
+
                 try {
                     selection = Integer.parseInt(selInput);
                 } catch (NumberFormatException e) {
@@ -39,45 +43,50 @@ public class TicTacToeApp {
             boolean humanVsComputer = (selection == 2);
             boolean computerVsHuman = (selection == 3);
 
+          
             if (computerVsHuman) {
-                startingPlayer = 'X'; 
+                startingPlayer = 'X'; // computer will be X
             } else {
-                startingPlayer = 'X'; 
+                startingPlayer = 'X'; // human starts otherwise (same as before)
             }
 
             TicTacToeGame game = new TicTacToeGame(startingPlayer);
+
+            System.out.println();
             game.printBoard();
 
-           
             if (computerVsHuman && game.getCurrentPlayer() == 'X') {
                 System.out.println("Affirmative. The computer shall go first.");
-            } else if (humanVsComputer || humanVsHuman) {
-                
             }
 
+         
             while (!game.isGameOver()) {
-                char current = game.getCurrentPlayer();
 
+                char current = game.getCurrentPlayer();
                 boolean isComputerTurn = false;
-                if (humanVsComputer) {
-                    
-                    if (current == 'O') isComputerTurn = true;
-                } else if (computerVsHuman) {
-                    
-                    if (current == 'X') isComputerTurn = true;
-                } 
+
+               
+                if (humanVsComputer && current == 'O') {
+                    isComputerTurn = true;
+                }
+                if (computerVsHuman && current == 'X') {
+                    isComputerTurn = true;
+                }
 
                 if (isComputerTurn) {
-                  
-                    game.makeComputerMove();
+                
+                    int aiMove = cpu.chooseMove(game);
+                    System.out.println("Computer chooses space " + aiMove);
+                    game.makeMove(aiMove);
                     game.printBoard();
                     continue;
                 }
 
-               
+              
                 System.out.print("What is your move? ");
                 String input = in.nextLine().trim();
                 int move;
+
                 try {
                     move = Integer.parseInt(input);
                 } catch (NumberFormatException e) {
@@ -93,6 +102,7 @@ public class TicTacToeApp {
                 game.printBoard();
             }
 
+      
             char winner = game.getWinner();
 
             if (winner == 'X') {
@@ -110,7 +120,9 @@ public class TicTacToeApp {
 
             logger.displayLog(stats);
 
+
             boolean validResponse = false;
+
             while (!validResponse) {
                 System.out.print("Would you like to play again (yes/no)? ");
                 String response = in.nextLine().trim().toLowerCase();
@@ -135,7 +147,7 @@ public class TicTacToeApp {
         in.close();
     }
 
-   
+
     public static void saveGameLogForTest(int xWins, int oWins, int ties, String fileName) {
         try (PrintWriter out = new PrintWriter(new FileWriter(fileName))) {
             out.println("Final Tic-Tac-Toe Game Log");
